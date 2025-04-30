@@ -1,4 +1,3 @@
-streamlit
 accelerate
 transformers
 langchain-core
