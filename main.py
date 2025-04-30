@@ -46,7 +46,12 @@ async def chat_endpoint(request: Request):
             return {"error": "GROQ_API_KEY not found in environment variables."}
 
         # Load combined retriever (user + site index)
-        retriever = get_combined_retriever()
+        # retriever = get_combined_retriever()
+        try:
+            retriever = get_combined_retriever()
+        except Exception as e:
+            print(f"[ERROR] Failed to load retriever: {e}")
+
 
         # Load LLM
         ChatGroq.model_rebuild()
