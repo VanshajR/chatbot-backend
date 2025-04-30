@@ -13,3 +13,4 @@ uvicorn
 pydantic
 beautifulsoup4
 requests
+python-dotenv
