@@ -1,0 +1,121 @@
+{
+    "personal_info": {
+        "name": "Vanshaj Raghuvanshi",
+        "email": "vanshajraghuvanshi@gmail.com",
+        "phone": "",
+        "location": "India",
+        "bio": "I am a third-year Computer Science and Engineering Student, aspiring to be a software engineer with a focus on Generative AI, while also pursuing Conversational AI at university. I like making software that makes things easier, and am actively looking for work opportunities.",
+        "skills": [
+            "Python",
+            "C",
+            "C++",
+            "JavaScript",
+            "Public Speaking",
+            "Generative AI",
+            "AI/ML",
+            "Conversational AI",
+            "Leadership",
+            "Collaboration",
+            "OpenCV",
+            "TensorFlow",
+            "PyTorch"
+        ]
+    },
+    "social_links": [
+        {
+            "platform": "LinkedIn",
+            "url": "https://www.linkedin.com/in/vanshajraghuvanshi/"
+        },
+        {
+            "platform": "Portfolio Site",
+            "url": "https://vanshajraghuvanshi.me/"
+        },
+        {
+            "platform": "GitHub",
+            "url": "https://github.com/VanshajR"
+        }
+    ],
+    "education": [
+        {
+            "institution": "Thapar Institute of Engineering and Technology",
+            "degree": "Bachelor of Engineering",
+            "field_of_study": "Computer Science and Engineering",
+            "start_year": 2022,
+            "end_year": 2026
+        }
+    ],
+    "work_experience": [
+        {
+            "organization": "Meril ",
+            "role": "Artificial Intelligence Intern",
+            "start_month_year": "06/2024",
+            "end_month_year": "08/2024",
+            "description": "Performed data cleaning and refining for training and testing datasets that improved accuracy by 30%. \n\nUtilized libraries such as TensorFlow and PyTorch to train models and researched relevant AI tools and techniques.\n",
+            "current": false
+        },
+        {
+            "organization": "CodeClause ",
+            "role": "Artificial Intelligence Intern",
+            "start_month_year": "06/2024",
+            "end_month_year": "07/2024",
+            "description": "Created multiple image processing and machine learning projects utilizing libraries such as OpenCV, Keras, and TensorFlow. \n\nDesigned intuitive GUIs for all projects, leading to a 15% increase in user interaction and engagement.\n",
+            "current": false
+        },
+        {
+            "organization": "Backslash Computing Society",
+            "role": "Technical Head",
+            "start_month_year": "05/2023",
+            "end_month_year": "06/2024",
+            "description": "Directed a high-impact workshop for HacktoberFest 2023, propelling the event into the prestigious HacktoberFest Hall of Fame amongst the top 10k contributors.\n",
+            "current": false
+        },
+        {
+            "organization": "Thapar Institute Counselling Cell",
+            "role": "Technical Lead",
+            "start_month_year": "05/2024",
+            "end_month_year": "Present",
+            "description": "Currently working as the technical lead of TICC, also a mental health student ambassador.\n",
+            "current": true
+        }
+    ],
+    "projects": [
+        {
+            "name": "Nexus QA",
+            "description": "A chatbot that uses LLMs and RAG to answer questions about Vanshaj Raghuvanshi. Hosted on Streamlit. ",
+            "github": "https://github.com/VanshajR/Nexus-QA",
+            "live_link": "https://chat-nexus.streamlit.app/"
+        },
+        {
+            "name": "Pneumonia Detection",
+            "description": "An application that uses a trained Convolutional Neural Network to predict whether uploaded X-Ray images exhibit pneumonia, and compares the results obtained via PCA, SVM and Logistic Regression as well. Hosted on Streamlit. ",
+            "github": "https://github.com/VanshajR/Pneumonia_Detection",
+            "live_link": "https://pneumonia-vanshajr.streamlit.app/"
+        },
+        {
+            "name": "Branchify",
+            "description": "A published python package that creates the folder structure of whichever directory it is used in, with customizable parameters. ",
+            "github": "https://github.com/VanshajR/Branchify",
+            "live_link": "https://pypi.org/project/branchify/"
+        },
+        {
+            "name": "AutoQuote",
+            "description": " A published VS Code Extension that allows for automatic insertion of quotes in the code, with similar additional features.",
+            "github": "https://github.com/VanshajR/AutoQuote",
+            "live_link": "https://marketplace.visualstudio.com/items?itemName=VanshajRaghuvanshi.auto-quote"
+        }
+    ],
+    "achievements": [
+        {
+            "title": "Scholarship",
+            "date": "",
+            "description": "Secured a scholarship for academic performance at university",
+            "link": ""
+        },
+        {
+            "title": "SIH 2024",
+            "date": "",
+            "description": "Qualified for Smart India Hackathon 2024 ",
+            "link": ""
+        }
+    ]
+}

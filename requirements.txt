@@ -1,0 +1,15 @@
+streamlit
+accelerate
+transformers
+langchain-core
+langchain-community
+faiss-cpu
+langchain-huggingface
+langchain-groq
+langchain
+chatsynth_vanshajr
+fastapi
+uvicorn
+pydantic
+beautifulsoup4
+requests
