@@ -1,109 +1,113 @@
-import json
 import os
+import json
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain.memory import ConversationBufferMemory
+from langchain_groq import ChatGroq
+from langchain_core.prompts import ChatPromptTemplate
 from retriever import get_combined_retriever
 from dotenv import load_dotenv
-from fastapi.responses import JSONResponse
-from uuid import uuid4
 
 load_dotenv()
 
-# Load user name from profile
+# Load API keys
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# Load user profile once
 with open("user_profile.json") as f:
     user_data = json.load(f)
 user_name = user_data["personal_info"]["name"]
 
 app = FastAPI()
 
-# CORS for frontend on Vercel
+# CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Request format
-class ChatRequest(BaseModel):
-    message: str
-    session_id: str
-    model: str = "Llama3-70b-8192"
-
-# Memory store
-memory_store = {}
-
-def get_memory(session_id: str) -> ConversationBufferMemory:
-    if session_id not in memory_store:
-        memory_store[session_id] = ConversationBufferMemory(return_messages=True)
-    return memory_store[session_id]
-
-# Prompt
-prompt_template = ChatPromptTemplate.from_template("""
-You are an AI assistant created to answer questions about {name}. You are **not** {name}, but you use the provided context to give accurate responses.
-
-Context about {name}:
-{context}
-
-Conversation History:
-{history}
-
-**Rules:**
-1. Be respectful and professional.
-2. Answer only using the given context.
-3. If unsure, say "I don't have that information."
-4. Keep responses professional and concise.
-
-**User's Question:** {input}
-""")
-
-@app.get("/ping")
-def health_check():
-    return JSONResponse({"status": "ok"})
+# In-memory chat history store
+chat_histories = {}
 
 @app.post("/chat")
-async def chat(req: ChatRequest):
+async def chat_endpoint(request: Request):
     try:
+        body = await request.json()
+        user_prompt = body.get("prompt")
+        session_id = body.get("session_id", "default")
+
+        if not user_prompt:
+            return {"error": "No prompt provided."}
+        if not GROQ_API_KEY:
+            return {"error": "GROQ_API_KEY not found in environment variables."}
+
+        # Load combined retriever (user + site index)
         retriever = get_combined_retriever()
-        llm = ChatGroq(model_name=req.model, api_key=os.getenv("GROQ_API_KEY"))
 
-        # Create core chain
-        base_chain = create_retrieval_chain(
+        # Load LLM
+        ChatGroq.model_rebuild()
+        llm = ChatGroq(temperature=0, model_name="Llama3-70b-8192", api_key=GROQ_API_KEY)
+
+        # Chat prompt template
+        prompt_template = ChatPromptTemplate.from_template("""
+        You are an AI assistant created to answer questions about {name}. You are **not** {name}, but you use the provided context to give accurate responses.
+
+        Context about {name}:
+        {context}
+
+        Conversation History:
+        {history}
+
+        **Rules:**
+        1. Be respectful and professional.
+        2. Answer only using the given context.
+        3. If unsure, say "I don't have that information."
+        4. Keep responses professional and concise.
+
+        **User's Question:** {input}
+        """)
+
+        # Chain setup
+        chain = create_retrieval_chain(
             retriever,
-            create_stuff_documents_chain(llm, prompt_template),
+            create_stuff_documents_chain(llm, prompt_template)
         )
 
-        # Wrap with RunnableWithMessageHistory
-        chain = RunnableWithMessageHistory(
-            base_chain,
-            lambda session_id: get_memory(session_id),
-            input_messages_key="input",
-            history_messages_key="history",
-        )
+        # Retrieve documents
+        retrieved_docs = retriever.get_relevant_documents(user_prompt)
+
+        # Get last 5 messages from session history
+        if session_id not in chat_histories:
+            chat_histories[session_id] = []
+        history_msgs = chat_histories[session_id][-5:]
+        history = "\n".join([f"{m['role']}: {m['content']}" for m in history_msgs])
 
         # Invoke chain
-        response = chain.invoke(
-            {
-                "input": req.message,
-                "name": user_name,
-                "context": ""
-            },
-            config={"configurable": {"session_id": req.session_id}}
-        )
+        result = chain.invoke({
+            "input": user_prompt,
+            "name": user_name,
+            "context": "\n\n".join([doc.page_content for doc in retrieved_docs]),
+            "history": history
+        })
 
-        answer = response.get("answer", "I don't have that information.")
-        return {"answer": answer}
+        answer = result.get("answer", "I don't have that information.")
+
+        # Update history
+        chat_histories[session_id].append({"role": "user", "content": user_prompt})
+        chat_histories[session_id].append({"role": "assistant", "content": answer})
+
+        return {"response": answer}
 
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     import uvicorn
