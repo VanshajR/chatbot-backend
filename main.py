@@ -8,7 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.memory import ConversationBufferMemory
-from utils.retriever import get_combined_retriever
+from retriever import get_combined_retriever
 from dotenv import load_dotenv
 
 # Load user name from profile
