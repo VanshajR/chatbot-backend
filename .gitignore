@@ -1,2 +1,2 @@
 .env
-web_loader.py\
+__pycache__/
