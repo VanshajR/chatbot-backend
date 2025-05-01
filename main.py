@@ -168,7 +168,7 @@ except Exception as e:
 # Initialize Groq LLM and chain
 print("[INIT] Initializing ChatGroq...")
 ChatGroq.model_rebuild()
-llm = ChatGroq(temperature=0, model_name="Mixtral-8x7b-32768", api_key=GROQ_API_KEY)
+llm = ChatGroq(temperature=0, model_name="gemma2-9b-it", api_key=GROQ_API_KEY)
 
 prompt_template = ChatPromptTemplate.from_template("""
 You are an AI assistant created to answer questions about {name}. You are **not** {name}, but you use the provided context to give accurate responses.
