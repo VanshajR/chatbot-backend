@@ -33,6 +33,43 @@ app.add_middleware(
 # In-memory chat history store
 chat_histories = {}
 
+try:
+    retriever = get_combined_retriever()
+except Exception as e:
+    print(f"[ERROR] Failed to load retriever: {e}")
+
+
+# Load LLM
+ChatGroq.model_rebuild()
+llm = ChatGroq(temperature=0, model_name="gemma2-9b-it", api_key=GROQ_API_KEY)
+
+# Chat prompt template
+prompt_template = ChatPromptTemplate.from_template("""
+You are an AI assistant created to answer questions about {name}. You are **not** {name}, but you use the provided context to give accurate responses.
+
+Context about {name}:
+{context}
+
+Conversation History:
+{history}
+
+**Rules:**
+1. Be respectful and professional.
+2. Answer only using the given context.
+3. If unsure, say "I don't have that information."
+4. Keep responses professional and concise.
+
+**User's Question:** {input}
+""")
+
+# Chain setup
+chain = create_retrieval_chain(
+    retriever,
+    create_stuff_documents_chain(llm, prompt_template)
+)
+
+
+
 @app.post("/chat")
 async def chat_endpoint(request: Request):
     try:
@@ -47,44 +84,9 @@ async def chat_endpoint(request: Request):
 
         # Load combined retriever (user + site index)
         # retriever = get_combined_retriever()
-        try:
-            retriever = get_combined_retriever()
-        except Exception as e:
-            print(f"[ERROR] Failed to load retriever: {e}")
-
-
-        # Load LLM
-        ChatGroq.model_rebuild()
-        llm = ChatGroq(temperature=0, model_name="gemma2-9b-it", api_key=GROQ_API_KEY)
-
-        # Chat prompt template
-        prompt_template = ChatPromptTemplate.from_template("""
-        You are an AI assistant created to answer questions about {name}. You are **not** {name}, but you use the provided context to give accurate responses.
-
-        Context about {name}:
-        {context}
-
-        Conversation History:
-        {history}
-
-        **Rules:**
-        1. Be respectful and professional.
-        2. Answer only using the given context.
-        3. If unsure, say "I don't have that information."
-        4. Keep responses professional and concise.
-
-        **User's Question:** {input}
-        """)
-
-        # Chain setup
-        chain = create_retrieval_chain(
-            retriever,
-            create_stuff_documents_chain(llm, prompt_template)
-        )
-
+        
         # Retrieve documents
         retrieved_docs = retriever.get_relevant_documents(user_prompt)
-
         # Get last 5 messages from session history
         if session_id not in chat_histories:
             chat_histories[session_id] = []
