@@ -195,50 +195,72 @@ chain = create_retrieval_chain(
 
 # ===== API ROUTES =====
 
+# @app.post("/chat")
+# async def chat_endpoint(request: Request):
+#     try:
+#         body = await request.json()
+#         user_prompt = body.get("prompt")
+#         session_id = body.get("session_id", "default")
+
+#         if not user_prompt:
+#             return {"error": "No prompt provided."}
+#         if not GROQ_API_KEY:
+#             return {"error": "GROQ_API_KEY not found in environment variables."}
+#         if not retriever:
+#             return {"error": "Retriever could not be initialized."}
+
+#         # Get relevant docs
+#         try:
+#             print(f"[RETRIEVAL] Getting relevant documents for: {user_prompt}")
+#             retrieved_docs = retriever.get_relevant_documents(user_prompt)
+#             print(f"[RETRIEVAL] Retrieved {len(retrieved_docs)} docs.")
+#         except Exception as e:
+#             print(f"[ERROR] Document retrieval failed: {e}")
+#             retrieved_docs = []
+
+#         # Get history
+#         if session_id not in chat_histories:
+#             chat_histories[session_id] = []
+#         history_msgs = chat_histories[session_id][-5:]
+#         history = "\n".join([f"{m['role']}: {m['content']}" for m in history_msgs])
+
+#         # Run chain
+#         print("[CHAIN] Invoking chain...")
+#         result = chain.invoke({
+#             "input": user_prompt,
+#             "name": user_name,
+#             "context": "\n\n".join([doc.page_content for doc in retrieved_docs]),
+#             "history": history
+#         })
+
+#         answer = result.get("answer", "I don't have that information.")
+
+#         # Save history
+#         chat_histories[session_id].append({"role": "user", "content": user_prompt})
+#         chat_histories[session_id].append({"role": "assistant", "content": answer})
+
+#         return {"response": answer}
+
+#     except Exception as e:
+#         print(f"[ERROR] /chat route crashed: {e}")
+#         return {"error": str(e)}
+
 @app.post("/chat")
 async def chat_endpoint(request: Request):
     try:
         body = await request.json()
         user_prompt = body.get("prompt")
-        session_id = body.get("session_id", "default")
 
-        if not user_prompt:
-            return {"error": "No prompt provided."}
-        if not GROQ_API_KEY:
-            return {"error": "GROQ_API_KEY not found in environment variables."}
-        if not retriever:
-            return {"error": "Retriever could not be initialized."}
+        dummy_context = "Vanshaj Raghuvanshi is a computer science student with experience in AI and full-stack development."
 
-        # Get relevant docs
-        try:
-            print(f"[RETRIEVAL] Getting relevant documents for: {user_prompt}")
-            retrieved_docs = retriever.get_relevant_documents(user_prompt)
-            print(f"[RETRIEVAL] Retrieved {len(retrieved_docs)} docs.")
-        except Exception as e:
-            print(f"[ERROR] Document retrieval failed: {e}")
-            retrieved_docs = []
-
-        # Get history
-        if session_id not in chat_histories:
-            chat_histories[session_id] = []
-        history_msgs = chat_histories[session_id][-5:]
-        history = "\n".join([f"{m['role']}: {m['content']}" for m in history_msgs])
-
-        # Run chain
-        print("[CHAIN] Invoking chain...")
         result = chain.invoke({
             "input": user_prompt,
             "name": user_name,
-            "context": "\n\n".join([doc.page_content for doc in retrieved_docs]),
-            "history": history
+            "context": dummy_context,
+            "history": ""
         })
 
-        answer = result.get("answer", "I don't have that information.")
-
-        # Save history
-        chat_histories[session_id].append({"role": "user", "content": user_prompt})
-        chat_histories[session_id].append({"role": "assistant", "content": answer})
-
+        answer = result.get("answer", "No answer found.")
         return {"response": answer}
 
     except Exception as e:
